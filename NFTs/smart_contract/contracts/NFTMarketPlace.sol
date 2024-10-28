@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: SEE LICENSE IN LICENSE
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -16,7 +16,9 @@ contract NFTMarketplace is ERC721URIStorage, Ownable {
 
     struct NFT {
         uint tokenId;
-        string url;
+        string name; // Added name field
+        string url;  // This can be the image URL
+        string description; // Added description field
         address payable owner;
         uint price;
         bool isListed;
@@ -27,14 +29,16 @@ contract NFTMarketplace is ERC721URIStorage, Ownable {
 
     constructor() ERC721("SCUBI", "SCB") Ownable(msg.sender) {}
 
-    function mintNFT(string memory _tokenURI) external returns (uint) {
+    function mintNFT(string memory _name, string memory _tokenURI, string memory _description) external returns (uint) {
         _tokenId++;
         _safeMint(msg.sender, _tokenId);
         _setTokenURI(_tokenId, _tokenURI);
 
         nfts[_tokenId] = NFT({
             tokenId: _tokenId,
+            name: _name, // Set the NFT name
             url: _tokenURI,
+            description: _description, // Set the NFT description
             owner: payable(msg.sender),
             price: 0,
             isListed: false,
@@ -78,13 +82,51 @@ contract NFTMarketplace is ERC721URIStorage, Ownable {
         payable(owner()).transfer(address(this).balance);
     }
 
-    function getAllListedNFTs() public view returns (NFT[] memory) {
-        NFT[] memory listedNFTs = new NFT[](_tokenId);
+    function getAllNFTS() public view returns (NFT[] memory) {
+        NFT[] memory result = new NFT[](_tokenId);
+        uint index = 0;
+        for (uint i = 1; i <= _tokenId; i++) {
+            result[index] = nfts[i];
+            index++;
+        }
+        return result;
+    }
 
-        for (uint i = 0; i < _tokenId; i++) {
-            listedNFTs[i] = nfts[i];
+    function getAllListedNFTs() public view returns (NFT[] memory) {
+        uint listedCount = 0;
+        for (uint i = 1; i <= _tokenId; i++) {
+            if (nfts[i].isListed) {
+                listedCount++;
+            }
         }
 
+        NFT[] memory listedNFTs = new NFT[](listedCount);
+        uint index = 0;
+        for (uint i = 1; i <= _tokenId; i++) {
+            if (nfts[i].isListed) {
+                listedNFTs[index] = nfts[i];
+                index++;
+            }
+        }
         return listedNFTs;
+    }
+
+    function getAllSoldNFTs() public view returns (NFT[] memory) {
+        uint soldCount = 0;
+        for (uint i = 1; i <= _tokenId; i++) {
+            if (nfts[i].isSold) {
+                soldCount++;
+            }
+        }
+
+        NFT[] memory soldNFTs = new NFT[](soldCount);
+        uint index = 0;
+        for (uint i = 1; i <= _tokenId; i++) {
+            if (nfts[i].isSold) {
+                soldNFTs[index] = nfts[i];
+                index++;
+            }
+        }
+        return soldNFTs;
     }
 }

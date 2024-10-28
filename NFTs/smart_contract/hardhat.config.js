@@ -9,8 +9,8 @@ module.exports = {
   },
   networks: {
     sepolia: {
-      url: "https://eth-sepolia.g.alchemy.com/v2/-cRAeZTK6EQK4eWKF2L7zDJUqhMyvOAg", // Replace with your Alchemy API key
-      accounts: [`0x${process.env.PRIVATE_KEY}`], // Add your private key as an environment variable
+      url: "https://eth-sepolia.g.alchemy.com/v2/-cRAeZTK6EQK4eWKF2L7zDJUqhMyvOAg",
+      accounts: [`0x${process.env.PRIVATE_KEY}`],
     },
   },
 };
